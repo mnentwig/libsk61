@@ -10,6 +10,6 @@ function sk61example_td_estFundPeriod()
     x = 0:10000;
     T = 123.456;    
     y = cos(x/T*2*pi);
-    tEst_samples = libsk61.td.estFundPeriod(y, 1.99*T);
+    tEst_samples = libsk61.td.estFundPeriod([y, 0*y], 1.99*T);
     fprintf(stdout, 'True period: %1.5d estimated: %1.5f\n', T, tEst_samples);
 end
