@@ -9,6 +9,8 @@ function lib = libsk61_0v1()
 %     spline.eval
 %     td2td.noncausalResampler
 %     td2td.delay
+%     td2td.dcBlock
+%     td.estFundPeriod
     persistent self;
     if ~isempty(self) 
         lib = self;
@@ -20,7 +22,10 @@ function lib = libsk61_0v1()
         'eval', @spline_eval);
     self.td2td = struct(...
         'noncausalResampler', @td2td_noncausalResampler, ...
-        'delay', @td2td_delay);
+        'delay', @td2td_delay, ...
+        'dcBlock', @td2td_dcBlock);
+    self.td = struct(...
+        'estFundPeriod', @td_estFundPeriod);
     lib = self;
 end
 
@@ -257,3 +262,80 @@ function td = td2td_delay(td, delay_samples)
     end
 end
 
+% fundamental frequency estimation 
+function tPeriod = td_estFundPeriod(s, tMax)
+    if nargin == 0
+        d();
+        d('tPeriod = td_estFundPeriod(s, tMin)');
+        d();
+        d('    estimates the fundamental period in s');
+        d('s:');
+        d('    input data');
+        d('tMin: (optional)');
+        d('    limit estimate to tMax (suppress detection of multiples)');
+        d('tPeriod (real)');
+        d('    fundamental period estimate');
+        return;
+    end
+
+    if nargin < 2
+        tMax = floor(numel(s)/2);
+    end
+    
+    % === autocorrelation ===
+    n = numel(s);
+    tmp = fft(s);
+    tmp = real(ifft(tmp .* conj(tmp)));
+    
+    % note: could take logarithm here (cepstrum)
+    
+    % === periodicity of autocorrelation ===
+    tmp = fft(tmp);
+    tmp = real(ifft(tmp .* conj(tmp)));
+    
+    % === blank out dt=0 peak ===
+    tmp(1) = 0;
+    for ix = 2 : numel(tmp)/2-1
+        if tmp(ix) < tmp(ix+1)
+            break;
+        end
+        tmp(ix) = 0;
+        tmp(end-ix+2) = 0;
+    end
+    
+    % === pick eligible maxima ===
+    xc = tmp;
+    tmp = xc(1:tMax);
+    xcMax = max(tmp);
+    
+    % === locate maximum between samples ===
+    % f(x):=a+b*x+c*x^2;
+    % sol:solve([f(-1)=vm, f(0)=v, f(1)=vp], [a, b, c]);
+    % solve(diff(ev(f(x), sol), x, 1)=0, x);
+    % diff(ev(f(x), sol), x, 2);
+    % Solution: "[x = -(vp-vm)/(2*vp+2*vm-4*v)]"
+    % 2nd derivative: vp+vm-2*v
+    % Poly fit: 
+    % [a = v,b = -(vm-vp)/2,c = (vp+vm-2*v)/2]
+    
+    ixPeak = find(tmp == xcMax, 1, 'first');
+
+    r = ixPeak-1:ixPeak+1;
+    r = mod(r-1, n)+1;
+    vm = sqrt(double(xc(r(1))));
+    v = sqrt(double(xc(r(2))));
+    vp = sqrt(double(xc(r(3))));
+    
+    x = -(vp-vm)/(2*vp+2*vm-4*v);
+    ddx = vp+vm-2*v;
+    
+    if ((ddx >= 0) || (x < -1) || (x > 1)) 
+        disp('warning: no useful poly maximum. Using peak xcorr bin');
+        x = 0;
+    end
+    tPeriod = ixPeak - 1 + x;
+end
+
+function s = td2td_dcBlock(s)
+    s = s - sum(s) / numel(s);
+end

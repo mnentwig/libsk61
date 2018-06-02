@@ -16,7 +16,7 @@ Fit a spline to data
 
 Evaluate a spline
 
-## td2td
+## td and td2td
 
 Operations on cyclic signals (td2td for 'timedomain to timedomain')
 
@@ -27,3 +27,7 @@ Changes sample rate using ideal lowpass filtering
 ### td2td.delay(...)
 
 delay (cyclic shift) with subsample precision
+
+### td2.estFundPeriod(...)
+
+Estimates a fundamental period (looks for periodicity in autocorrelation)
