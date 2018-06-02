@@ -129,7 +129,8 @@ function c = spline_create(x, y, nSeg, xDiscontLvl, xDiscontSlope)
 
         % === forwards looking segment ===
         ixp = 4*ixSeg-3:4*ixSeg;
-        xEv = interp1([ixSeg-1:ixSeg], [-1, 1], x+1e-15, 'linear', 'extrap');
+        
+        xEv = (x-ixSeg+0.5)*2;% interp1([ixSeg-1:ixSeg], [-1, 1], x+1e-15, 'linear', 'extrap');
         mask = (xEv >= -1) & (xEv < 1);
         
         ixc = ixc + 1;
@@ -145,7 +146,7 @@ function c = spline_create(x, y, nSeg, xDiscontLvl, xDiscontSlope)
         % === backwards looking segment ===
         ixSegBack = mod(ixSeg-2, nSeg) + 1;
         ixp = 4*ixSegBack-3:4*ixSegBack;
-        xEv = interp1([ixSegBack-1:ixSegBack], [-1, 1], x+1e-15, 'linear', 'extrap');    
+        xEv = (x-ixSegBack+0.5)*2; % interp1([ixSegBack-1:ixSegBack], [-1, 1], x+1e-15, 'linear', 'extrap');    
         mask = (xEv >= -1) & (xEv < 1);
         
         if splitLevelFlag
