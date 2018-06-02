@@ -1,7 +1,14 @@
 function lib = libsk61_0v1()
-% self = libsk61() contains functions:
-% spline.creat
-% spline.eval
+% usage: 
+% lib = libsk61();
+% use functions with lib.functionname, e.g. lib.spline.create(...)
+% omit arguments to show usage information, e.g. lib.spline.create()
+%
+% lib contains functions:
+%     spline.create
+%     spline.eval
+%     td2td.noncausalResampler
+%     td2td.delay
     persistent self;
     if ~isempty(self) 
         lib = self;
