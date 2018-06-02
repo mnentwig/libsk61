@@ -105,6 +105,7 @@ function c = spline_create(x, y, nSeg, xDiscontLvl, xDiscontSlope)
     if nargin < 3 error('need at least x, y, n'); end
     if nargin < 4 xDiscontLvl = [1]; end
     if nargin < 5 xDiscontSlope = xDiscontLvl; end
+    if nargin > 5 error('too many arguments'); end
     if floor(xDiscontLvl) ~= xDiscontLvl error('xDiscontLvl must be integer (can split only between poly segments)'); end
     if floor(xDiscontSlope) ~= xDiscontSlope error('xDiscontSlope must be integer (can split only between poly segments)'); end
     xDiscontLvl = mod(xDiscontLvl, nSeg);
@@ -200,6 +201,7 @@ function td = td2td_noncausalResampler(td, n)
         d('    number of samples in output');
         return;
     end
+    if nargin > 2 error('too many arguments'); end
 
     assert(n > 0);
     nOld = numel(td); assert(nOld > 0, 'got empty signal');
@@ -239,6 +241,7 @@ function td = td2td_delay(td, delay_samples)
         d('    delay to apply on td');
         return;
     end
+    if nargin > 2 error('too many arguments'); end
     if delay_samples == 0 
         return;
     end
@@ -281,6 +284,7 @@ function tPeriod = td_estFundPeriod(s, tMax)
     if nargin < 2
         tMax = floor(numel(s)/2);
     end
+    if nargin > 2 error('too many arguments'); end
     
     % === autocorrelation ===
     n = numel(s);
@@ -346,5 +350,6 @@ function s = td2td_dcBlock(s)
         d('    input data');
         return;
     end
+    if nargin > 1 error('too many arguments'); end
     s = s - sum(s) / numel(s);
 end
