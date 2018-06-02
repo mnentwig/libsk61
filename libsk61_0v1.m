@@ -28,7 +28,8 @@ function lib = libsk61_0v1()
     self.td = struct(...
         'estFundPeriod', @td_estFundPeriod);
     self.fd = struct(...
-        'binFreq', @fd_binFreq);
+        'binFreq', @fd_binFreq, ...
+        'freqRespZ', @fd_freqRespZ);
     lib = self;
 end
 
@@ -372,4 +373,27 @@ function f = fd_binFreq(n)
     end
     if nargin ~= 1 error('need 1 input argument'); end        
     f = (mod(((0:n-1)+floor(n/2)), n)-floor(n/2))/n;
+end
+
+function H = fd_freqRespZ(b, a, f)
+    if nargin == 0
+        d();
+        d('f = fd_freqRespZ(b, a, f)');
+        d();
+        d('    frequency response of discrete time (z domain) IIR filter');
+        d('b: (cx real vector)');
+        d('    numerator coefficients');
+        d('a: (cx real vector)');
+        d('    denominator coefficients');
+        d('f:');
+        d('    frequency vector; unity range is represented by [-0.5, 0.5[');
+        d('H: return value (cx real vector)');
+        d('    frequency response');
+        return;
+    end
+    if nargin ~= 3 error('need 3 input arguments'); end        
+    rot = exp(-2i*pi*f);
+    H_num = polyval(fliplr(b), rot);
+    H_denom = polyval(fliplr(a), rot);
+    H = H_num ./ H_denom;
 end
