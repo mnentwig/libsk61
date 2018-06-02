@@ -11,6 +11,7 @@ function lib = libsk61_0v1()
 %     td2td.delay
 %     td2td.dcBlock
 %     td.estFundPeriod
+%     fd.binFreq
     persistent self;
     if ~isempty(self) 
         lib = self;
@@ -26,6 +27,8 @@ function lib = libsk61_0v1()
         'dcBlock', @td2td_dcBlock);
     self.td = struct(...
         'estFundPeriod', @td_estFundPeriod);
+    self.fd = struct(...
+        'binFreq', @fd_binFreq);
     lib = self;
 end
 
@@ -353,4 +356,20 @@ function s = td2td_dcBlock(s)
     end
     if nargin > 1 error('too many arguments'); end
     s = s - sum(s) / numel(s);
+end
+
+function f = fd_binFreq(n)
+    if nargin == 0
+        d();
+        d('f = fd_binFreq(n)');
+        d();
+        d('    frequency vector for FFT');
+        d('n: (integer)');
+        d('    number of points');
+        d('f: return value (real vector spanning [-0.5 .. 0.5[)');
+        d('    relative frequencies corresponding to FFT bins');
+        return;
+    end
+    if nargin ~= 1 error('need 1 input argument'); end        
+    f = (mod(((0:n-1)+floor(n/2)), n)-floor(n/2))/n;
 end
