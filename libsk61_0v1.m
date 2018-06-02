@@ -337,5 +337,14 @@ function tPeriod = td_estFundPeriod(s, tMax)
 end
 
 function s = td2td_dcBlock(s)
+    if nargin == 0
+        d();
+        d('s = td2td_dcBlock(s)');
+        d();
+        d('    removes average from s');
+        d('s:');
+        d('    input data');
+        return;
+    end
     s = s - sum(s) / numel(s);
 end
